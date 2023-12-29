@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fokus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="titulo">Fokus</h1>
+    <div class="timer">
+      <div class="time-display">
+        <span id="minutes">25</span>:<span id="seconds">00</span>
+      </div>
+      <div class="controls">
+        <button id="light-focus">Light Focus</button>
+        <button id="medium-focus">Medium Focus</button>
+        <button id="deep-focus">Deep Focus</button>
+        <button id="start">Comenzar</button>
+        <button id="pause">Pausa</button>
+        <button id="reset">Resetear</button>
+      </div>
+    </div>
+    <div class="settings">
+      <label for="work-duration">Duración de trabajo:</label>
+      <input type="number" id="work-duration" value="25" min="1">
+      <label for="break-duration">Duración de descanso:</label>
+      <input type="number" id="break-duration" value="5" min="1">
+      <button id="apply-settings">Aplicar</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
