@@ -1,87 +1,80 @@
-// Obtener elementos del DOM
-const startButton = document.getElementById('start');
-const pauseButton = document.getElementById('pause');
-const resetButton = document.getElementById('reset');
-const workDurationInput = document.getElementById('work-duration');
-const breakDurationInput = document.getElementById('break-duration');
-const timerDisplay = document.querySelector('.time-display');
+document.addEventListener('DOMContentLoaded', function () {
+  const focusTab = document.getElementById('focusTab');
+  const shortBreakTab = document.getElementById('shortBreakTab');
+  const longBreakTab = document.getElementById('longBreakTab');
+  const timerDisplay = document.getElementById('timer');
+  const startPauseBtn = document.getElementById('startPauseBtn');
 
-let workDuration = 25; // Duración de trabajo predeterminada en minutos
-let breakDuration = 5; // Duración de descanso predeterminada en minutos
-let isTimerRunning = false;
-let timeLeft;
-let interval;
+  let timer;
+  let minutes = 25;
+  let seconds = 0;
+  let isPaused = true;
 
-// Función para actualizar el tiempo en el temporizador
-function updateTimer() {
-  const minutes = Math.floor(timeLeft / 60);
-  let seconds = timeLeft % 60;
-  seconds = seconds < 10 ? `0${seconds}` : seconds;
-  timerDisplay.textContent = `${minutes}:${seconds}`;
-}
+  function startTimer() {
+    timer = setInterval(updateTimer, 1000);
+  }
 
-// Función para iniciar el temporizador
-function startTimer() {
-  if (!isTimerRunning) {
-    isTimerRunning = true;
-    timeLeft = workDuration * 60; // Convertir minutos a segundos
-    updateTimer();
-    interval = setInterval(() => {
-      timeLeft--;
-      if (timeLeft < 0) {
-        clearInterval(interval);
-        if (workDuration === 60) {
-          changeFocusLevel(breakDuration, workDuration); // Cambiar a tiempo de descanso
-        } else {
-          changeFocusLevel(workDuration, breakDuration); // Cambiar a tiempo de trabajo
-        }
-        isTimerRunning = false;
-        startTimer();
+  function pauseTimer() {
+    clearInterval(timer);
+  }
+
+  function updateTimer() {
+    if (minutes === 0 && seconds === 0) {
+      clearInterval(timer);
+      // Lógica para cambiar a la siguiente pestaña o realizar acciones al finalizar el temporizador
+    } else {
+      if (seconds === 0) {
+        minutes--;
+        seconds = 59;
       } else {
-        updateTimer();
+        seconds--;
       }
-    }, 1000);
+      updateDisplay();
+    }
   }
-}
 
-// Función para cambiar la duración de trabajo y descanso
-function changeFocusLevel(work, breakTime) {
-  workDuration = work;
-  breakDuration = breakTime;
-  if (!isTimerRunning) {
-    timeLeft = workDuration * 60;
-    updateTimer();
+  function updateDisplay() {
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
-}
 
-// Eventos para los botones de cambio de enfoque
-document.getElementById('light-focus').addEventListener('click', function() {
-  changeFocusLevel(25, 5); // Cambiar a LightFocus (25 minutos de trabajo, 5 minutos de descanso)
-});
+  function switchTab(tabId, newMinutes) {
+    if (!isPaused) {
+      pauseTimer();
+      isPaused = true;
+    }
 
-document.getElementById('medium-focus').addEventListener('click', function() {
-  changeFocusLevel(40, 10); // Cambiar a MediumFocus (40 minutos de trabajo, 10 minutos de descanso)
-});
+    focusTab.classList.remove('active');
+    shortBreakTab.classList.remove('active');
+    longBreakTab.classList.remove('active');
 
-document.getElementById('deep-focus').addEventListener('click', function() {
-  changeFocusLevel(60, 15); // Cambiar a DeepFocus (60 minutos de trabajo, 15 minutos de descanso)
-});
+    document.getElementById(tabId).classList.add('active');
 
-// Evento para el botón de inicio
-startButton.addEventListener('click', startTimer);
+    minutes = newMinutes;
+    seconds = 0;
+    updateDisplay();
+  }
 
-// Evento para el botón de pausa
-pauseButton.addEventListener('click', function() {
-  clearInterval(interval); // Detener el temporizador
-  isTimerRunning = false;
-});
+  focusTab.addEventListener('click', function () {
+    switchTab('focusTab', 25);
+  });
 
-// Evento para el botón de reinicio
-resetButton.addEventListener('click', function() {
-  clearInterval(interval); // Detener el temporizador
-  isTimerRunning = false;
-  workDuration = 25; // Restaurar duración de trabajo predeterminada
-  breakDuration = 5; // Restaurar duración de descanso predeterminada
-  timeLeft = workDuration * 60; // Reiniciar tiempo restante
-  updateTimer(); // Actualizar el temporizador en la interfaz
+  shortBreakTab.addEventListener('click', function () {
+    switchTab('shortBreakTab', 5);
+  });
+
+  longBreakTab.addEventListener('click', function () {
+    switchTab('longBreakTab', 15);
+  });
+
+  startPauseBtn.addEventListener('click', function () {
+    if (isPaused) {
+      startTimer();
+      startPauseBtn.textContent = 'Pausar';
+    } else {
+      pauseTimer();
+      startPauseBtn.textContent = 'Reanudar';
+    }
+
+    isPaused = !isPaused;
+  });
 });
